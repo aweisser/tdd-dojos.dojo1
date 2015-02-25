@@ -31,9 +31,22 @@ public class EsAssetSearchIndexTest {
     Client client;
 
     @Test
-    @ElasticsearchIndex(indexName = "library4")
+    @ElasticsearchIndex(indexName = "library1")
     public void bulkInsert() throws IOException {
-        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "library4");
+        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "library1");
+
+        Asset asset1 = new Asset();
+        Asset asset2 = new Asset();
+        Asset asset3 = new Asset();
+
+        assertTrue(assetSearchIndex.update(asset1, asset2, asset3));
+        assertEquals(3L, assetSearchIndex.count());
+    }
+
+    @Test
+    @ElasticsearchIndex(indexName = "library2")
+    public void listAllAssets() throws IOException {
+        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "library2");
 
         Asset asset1 = new Asset();
         asset1.setId("1");
@@ -44,8 +57,11 @@ public class EsAssetSearchIndexTest {
         Asset asset3 = new Asset();
         asset3.setId("3");
 
-        assertTrue(assetSearchIndex.update(asset1, asset2, asset3));
-        assertEquals(3L, assetSearchIndex.count());
+        assetSearchIndex.update(asset1, asset2, asset3);
+        AssetList allAssets = assetSearchIndex.listAll();
+
+        assertThat(allAssets, hasItems(equalTo(asset1), equalTo(asset2), equalTo(asset3)));
+
     }
 
 

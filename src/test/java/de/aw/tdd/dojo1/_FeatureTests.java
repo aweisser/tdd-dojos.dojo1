@@ -4,7 +4,6 @@ import com.github.tlrx.elasticsearch.test.annotations.ElasticsearchClient;
 import com.github.tlrx.elasticsearch.test.annotations.ElasticsearchIndex;
 import com.github.tlrx.elasticsearch.test.annotations.ElasticsearchNode;
 import com.github.tlrx.elasticsearch.test.support.junit.runners.ElasticsearchRunner;
-import de.aw.tdd.dojo1.*;
 import org.elasticsearch.client.Client;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +13,7 @@ import java.net.URI;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItems;
 
 /**
  * @author armin.weisser
@@ -32,10 +32,27 @@ public class _FeatureTests {
         AssetSource assetSource = new UriAssetSource(test_assets_uri);
         AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "story1");
 
-        Asset[] assetList = assetSource.listAssets();
+        AssetList assetList = assetSource.listAssets();
         assetSearchIndex.update(assetList);
 
-        assertThat((int)assetSearchIndex.count(), equalTo(assetList.length));
+        assertThat((int)assetSearchIndex.count(), equalTo(assetList.size()));
     }
+
+    @Test
+    @ElasticsearchIndex(indexName = "story2")
+    public void story2_listAllAssets() throws IOException {
+        URI test_assets_uri = UriAssetSourceTest.TEST_ASSETS_URI;
+        AssetSource assetSource = new UriAssetSource(test_assets_uri);
+        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "story2");
+
+        AssetList assetList = assetSource.listAssets();
+        assetSearchIndex.update(assetList);
+
+        AssetList allIndexedAssets = assetSearchIndex.listAll();
+        assertThat((int)allIndexedAssets.size(), equalTo(assetList.size()));
+        assertThat(allIndexedAssets.getNames(), hasItems(assetList.getNames().toArray(new String[0])));
+    }
+
+
 
 }

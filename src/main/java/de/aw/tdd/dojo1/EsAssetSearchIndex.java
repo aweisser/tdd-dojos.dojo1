@@ -38,16 +38,17 @@ public class EsAssetSearchIndex implements AssetSearchIndex {
     }
 
 
-    /**
-     * Create or update multiple Assets and refresh the index
-     * @param assets
-     * @return true, if the bulk update has failures.
-     * @throws java.io.IOException
-     */
     @Override
     public boolean update(Asset... assets) throws IOException {
+        AssetList assetList = new AssetList();
+        assetList.add(assets);
+        return update(assetList);
+    }
+
+    @Override
+    public boolean update(AssetList assetList) throws IOException {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        for(Asset asset: assets) {
+        for(Asset asset: assetList) {
             bulkRequest.add(getIndexRequestBuilder(asset));
         }
 
@@ -57,6 +58,7 @@ public class EsAssetSearchIndex implements AssetSearchIndex {
         client.admin().indices().prepareRefresh().execute().actionGet();
 
         return !bulkResponse.hasFailures();
+
     }
 
     private IndexRequestBuilder getIndexRequestBuilder(Asset asset) throws IOException {
@@ -89,4 +91,23 @@ public class EsAssetSearchIndex implements AssetSearchIndex {
         return countResponse.getCount();
     }
 
+    @Override
+    public AssetList listAll() {
+        SearchResponse searchResponse = client.prepareSearch(indexName)
+                .setTypes(documentType)
+                .setSearchType(SearchType.QUERY_AND_FETCH)
+                .execute()
+                .actionGet();
+
+        return createAssetList(searchResponse);
+    }
+
+    private AssetList createAssetList(SearchResponse searchResponse) {
+        AssetList assetList = new AssetList();
+        for(SearchHit hit: searchResponse.getHits()) {
+            assetList.add(Asset.fromMap(hit.getSource()));
+        }
+
+        return assetList;
+    }
 }

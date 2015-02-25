@@ -21,13 +21,13 @@ public class UriAssetSource implements AssetSource {
     }
 
     @Override
-    public Asset[] listAssets() {
+    public AssetList listAssets() {
         Collection<File> sourceFiles = listSourceFiles();
-        Collection<Asset> assetList = new ArrayList<Asset>(sourceFiles.size());
+        AssetList assetList = new AssetList();
         for(File sourceFile: sourceFiles) {
             Asset asset = Asset.fromFile(sourceFile);
             assetList.add(asset);
         }
-        return assetList.toArray(new Asset[0]);
+        return assetList;
     }
 }

@@ -38,8 +38,8 @@ public class UriAssetSourceTest {
 
     @Test
     public void listAssets() throws URISyntaxException {
-        Asset[] assetList = assetSource.listAssets();
-        Collection<String> assetNames = new ArrayList<String>(assetList.length);
+        AssetList assetList = assetSource.listAssets();
+        Collection<String> assetNames = new ArrayList<String>(assetList.size());
         for(Asset asset: assetList) {
             assetNames.add(asset.getName());
         }
