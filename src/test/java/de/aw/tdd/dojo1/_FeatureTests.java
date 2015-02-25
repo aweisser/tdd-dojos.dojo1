@@ -26,11 +26,11 @@ public class _FeatureTests {
     Client client;
 
     @Test
-    @ElasticsearchIndex(indexName = "feature1")
+    @ElasticsearchIndex(indexName = "story1")
     public void story1_createIntialIndexFromExistingImageFolder() throws IOException {
         URI test_assets_uri = UriAssetSourceTest.TEST_ASSETS_URI;
         AssetSource assetSource = new UriAssetSource(test_assets_uri);
-        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "feature1");
+        AssetSearchIndex assetSearchIndex = new EsAssetSearchIndex(client, "story1");
 
         Asset[] assetList = assetSource.listAssets();
         assetSearchIndex.update(assetList);
